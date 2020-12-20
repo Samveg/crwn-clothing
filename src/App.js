@@ -34,7 +34,6 @@ class App extends React.Component {
               ...snapShot.data()
             }
           });
-          console.log(this.state);
         });
       } else {
         this.setState({currentUser: userAuth}) // If userAuth is null, set currentUser to null... i.e. if the user has signed out, the app's state should not contain user info
