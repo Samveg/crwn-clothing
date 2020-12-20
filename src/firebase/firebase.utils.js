@@ -12,6 +12,35 @@ const config = {
     measurementId: "G-ZPWSMTYHZQ"
   };
 
+// Create a user profile document that grabs key information at the time of account creation and posts it into a Firestore document
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+  if (!userAuth) return; // If the user auth object does not exist, exit from this function before doing anything...
+
+  const userRef = firestore.doc(`/users/${userAuth.uid}`); // Create a reference to a document with the name matching the UID, within the users collection
+  const snapShot = await userRef.get(); // Retrieves the actual document data
+  
+  // Query the firestore to see if this user already has an existing document, i.e. therefoer the user already exists... If no document exists for the user, run below code
+  if(!snapShot.exists) { // If a document at the specified reference, i.e. with the UID as the document name, does NOT exist... I.e. if the user does not exist yet
+    const { displayName, email } = userAuth;
+    const createdAt = new Date();
+
+    try {
+      await userRef.set({ // Create a document at this firebase Reference containing the object below...
+        // Object containing user data
+        displayName,
+        email,
+        createdAt,
+        ...additionalData
+      })
+    } catch (error) {
+      console.log('Error creating user', error.message);
+    }
+  }
+
+  return userRef;
+  };
+
+
 firebase.initializeApp(config);
 
 export const auth = firebase.auth();
